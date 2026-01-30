@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="description"
-        content="Lorem ipsum dolor sit amet, consectetur adipiscing elit.">
-  <meta name="keywords" content="template, sample, html">
+        content="Deep Learning-based Segmentation for Field Ion Microscopy (FIM) Image Analysis.">
+  <meta name="keywords" content="FIM, segmentation, deep learning, microscopy, project site">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>A Fancy Project</title>
+  <title>Deep Learning-based Segmentation for Microscopy Particle Analysis</title>
 
   <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
         rel="stylesheet">
@@ -18,212 +18,450 @@
 </head>
 <body>
 
+<!-- HERO -->
 <section class="hero">
   <div class="hero-body">
     <div class="container is-max-desktop">
       <div class="columns is-centered">
         <div class="column has-text-centered">
-          <h1 class="title is-1 publication-title">Deep Learning-based Segmentation for Field Ion Microscopy (FIM) Image Analysis</h1>
+          <h1 class="title is-1 publication-title">
+            Deep Learning-based Segmentation for Microscopy Particle Analysis
+          </h1>
+
+          <!-- Authors (edit as needed) -->
           <div class="is-size-5 publication-authors">
-            <span class="author-block">
-              Utku Ozbulak<sup>1</sup> and
-            </span>
-            <span class="author-block">
-              Kim Suah<sup>1</sup>
-            </span>
+            <span class="author-block">Kim Suah<sup>1</sup></span>
+            <!-- <span class="author-block">and Coauthor Name<sup>2</sup></span> -->
           </div>
 
+          <!-- Affiliations (edit as needed) -->
           <div class="is-size-5 publication-authors">
             <span class="author-block"><sup>1</sup>University Ghent</span>
           </div>
 
+          <!-- Optional links row -->
+          <!--
+          <div class="publication-links">
+            <span class="link-block"><a class="external-link button is-normal is-rounded is-dark" href="#" target="_blank">Paper</a></span>
+            <span class="link-block"><a class="external-link button is-normal is-rounded is-dark" href="#" target="_blank">Code</a></span>
+            <span class="link-block"><a class="external-link button is-normal is-rounded is-dark" href="#" target="_blank">Data</a></span>
+          </div>
+          -->
+
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<section class="section">
+<!-- 1. ABSTRACT -->
+<section class="section" id="abstract">
   <div class="container is-max-desktop">
-
     <div class="columns is-centered has-text-centered">
       <div class="column is-four-fifths">
         <h2 class="title is-3">Abstract</h2>
-        <div class="content has-text-justified">
-          <p> This project presents an AI-driven segmentation pipeline for microscopy image analysis, with a focus on data-centric design and instance-level evaluation. Starting from annotated images, pixel-level binary masks are constructed and organized into a structured dataset to ensure reproducible training and systematic analysis. Dataset characteristics such as aspect ratio and instance count are explicitly analyzed to identify data-driven sources of training instability.</p>
+          <div class="content has-text-justified">
 
-          <p>A U-Net-based segmentation model is trained under controlled preprocessing and training protocols, beginning with single-instance images to establish a stable baseline and extending to multi-instance scenarios. Beyond conventional pixel-level metrics such as Intersection over Union (IoU) and Dice score, segmentation performance is examined using qualitative overlay-based visualization and instance-count-based interpretation to better capture segmentation failure modes.</p>
-          <p>The results show that stable and interpretable segmentation performance depends not only on model architecture, but critically on data construction, geometric normalization, and evaluation perspective. This work highlights the limitations of pixel-level metrics in complex images and motivates the need for instance-aware analysis in practical segmentation pipelines.</p>
+            <p>
+              This project investigates a deep learning–based semantic segmentation pipeline for microscopy particle analysis,
+              with an emphasis on data-centric design, training stability, and instance-level evaluation. Dense binary masks are
+              generated from annotated images and organized into a reproducible dataset, with dataset characteristics such as
+              aspect ratio and instance count explicitly analyzed to identify sources of training instability.
+            </p>
+
+            <p>
+              A U-Net–based model is trained under controlled preprocessing and training protocols, progressing from
+              single-particle images to more complex multi-particle scenes. Beyond conventional pixel-level metrics such as
+              Intersection-over-Union (IoU) and Dice score, segmentation performance is evaluated using qualitative overlays and
+              instance-level interpretation.
+            </p>
+
+            <p>
+              The results show that while foreground localization remains stable, pixel-level accuracy does not reliably translate
+              to instance-level correctness in dense scenes. These findings highlight the limitations of overlap-based metrics and
+              motivate the need for instance-aware evaluation and modeling in practical microscopy segmentation tasks.
+            </p>
+          </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 2. DATA & PREPROCESSING -->
+<section class="section" id="data-preprocessing">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered">Data &amp; Preprocessing</h2>
+
+    <!-- 2.1 Mask generation -->
+    <div class="content has-text-justified">
+      <h3 class="title is-4">Mask generation</h3>
+      <p>
+        Annotated microscopy images were converted into binary segmentation masks using a color-based extraction pipeline implemented with <strong>OpenCV</strong>.
+        Red annotation contours were isolated via BGR-space thresholding, where a color range was defined instead of a fixed value to handle intensity variation and avoid contour fragmentation.
+        The extracted contours were then filled to form closed particle regions, converting visualization-oriented annotations into dense pixel-level supervision.
+        By explicitly separating particle regions from background noise, the generated masks guide the model to focus on morphology-relevant features, resulting in more stable optimization during training.
+
+      </p>
+
+      <!-- Optional figure placeholder -->
+
+      <figure class="has-text-centered">
+        <div class="columns is-centered is-vcentered">
+
+          <div class="column is-5 has-text-centered">
+            <img src="./static/images/original_mask.png" alt="Annotated image" style="width: 100%; max-width: 320px; height: auto;">
+          </div>
+
+          <div class="column is-5 has-text-centered">
+            <img src="./static/images/mask_mask.png"
+           alt="Generated binary mask"
+           style="width: 100%; max-width: 320px; height: auto;">
+          </div>
+
         </div>
-      </div>
+
+        <figcaption class="is-size-6 has-text-grey">
+          Figure 1. Example of mask generation from annotated image to binary mask.
+        </figcaption>
+      </figure>
+
     </div>
+
+    <hr>
+
+    <!-- 2.2 Dataset organization -->
+    <div class="content has-text-justified">
+      <h3 class="title is-4">Dataset organization</h3>
+      <p>
+        Images and their corresponding masks were organized using a CSV-based indexing scheme that links raw data with annotations and metadata.
+        Relative file paths were used to ensure portability and reproducibility across experiments.
+        This structured dataset representation enables consistent data loading and fair comparison between different experimental settings.
+
+      </p>
+
+      <!-- Optional schema/code block placeholder -->
+      <pre><code>
+# CSV schema
+# original_path, masked_path, annotator, img_width, img_height, stress_type
+      </code></pre>
+    </div>
+
+    <hr>
+
   </div>
 </section>
 
+<!-- 3. METHOD -->
+<section class="section" id="method">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered">Method</h2>
+
+    <!-- 3.1 Dataset pipeline -->
+    <div class="content has-text-justified">
+      <h3 class="title is-4">Dataset pipeline</h3>
+      <p>
+        A unified dataset pipeline was implemented via a custom <code>SegmentationDataset</code> class to standardize how image–mask pairs are loaded and paired across experiments.
+        The pipeline supports both CSV-based indexing with split filtering and directory-based discovery, enabling flexible dataset management without modifying training code.
+        By enforcing a single data-loading interface, the pipeline ensures consistent batching and fair comparison between experiments.
+      </p>
+    </div>
+
+    <hr>
+
+    <!-- 3.2 Preprocessing -->
+    <div class="content has-text-justified">
+      <h3 class="title is-4">Preprocessing</h3>
+      <p>
+        All input images and masks were converted to a fixed spatial resolution using an <strong>aspect-ratio–preserving resize-and-padding</strong> strategy.
+        RGB images were resized using bilinear interpolation and padded with the <strong>median pixel value</strong> to minimize border artifacts,
+        while binary masks were resized using nearest-neighbor interpolation and padded with zeros to preserve label integrity.
+        After preprocessing, masks were explicitly binarized to ensure consistent foreground–background labeling during training.
+      </p>
+
+      <figure class="image has-text-centered">
+        <img src="./static/images/padding.png"
+             alt="Preprocessing placeholder"
+             class="img-small75"
+             style="width: 100%; max-width: 600px; height: auto;">
+        <figcaption class="is-size-6 has-text-grey">
+          Figure 2. Geometry-preserving resize and padding strategy.
+          RGB images are padded using the median pixel value to reduce boundary artifacts.
+        </figcaption>
+      </figure>
+    </div>
+
+    <hr>
+
+    <!-- 3.3 Model & training -->
+    <div class="content has-text-justified">
+      <h3 class="title is-4">Model &amp; training</h3>
+
+      <ul>
+        <li><strong>Baseline model:</strong> U-Net with encoder–decoder architecture and skip connections</li>
+        <li><strong>Model selection:</strong> Validation-based early stopping to normalize comparison across experiments</li>
+        <li><strong>Focus:</strong> Training stability and fair comparison rather than aggressive tuning</li>
+      </ul>
+
+      <p>
+        A U-Net architecture was used as the baseline model for semantic segmentation due to its ability to preserve fine spatial details through skip connections.
+        Training was first performed on single-particle images to establish a stable reference point for convergence behavior.
+        Rather than fixing the number of training epochs, <strong>early stopping</strong> based on validation IoU was introduced to define a consistent model selection criterion across experiments with different data complexity.
+        This allowed each model to be evaluated at its optimal generalization point, ensuring that performance differences reflect dataset or model changes rather than arbitrary training duration.
+      </p>
+
+      <!-- Optional bullet placeholder -->
+      <ul class="is-size-7 has-text-grey">
+        <li><strong>Optimizer:</strong> Adam</li>
+        <li><strong>Learning rate:</strong> 3 × 10<sup>−4</sup></li>
+        <li><strong>Batch size:</strong> 4</li>
+        <li><strong>Early stopping:</strong> patience = 5 (validation IoU)</li>
+      </ul>
+    </div>
+
+  </div>
+</section>
+
+<!-- 4. EXPERIMENTS & RESULTS -->
+<section class="section" id="experiments-results">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered">Experiments &amp; Results</h2>
+
+    <!-- 4.1 Single-instance baseline -->
+    <div class="content has-text-justified">
+      <h3 class="title is-4">Single-particle baseline</h3>
+      <p>
+        Initial experiments revealed less stable training behavior when directly applying the segmentation model to images containing multiple particles, making it difficult to disentangle model limitations from data-driven complexity.
+        To isolate baseline model behavior under <strong>minimal instance-level ambiguity</strong>, training was first restricted to single-particle images.
+        This controlled setting removes instance overlap and boundary ambiguity, allowing convergence behavior and segmentation quality to be evaluated without confounding factors.
+      </p>
+
+      <ul>
+        <li><strong>Problem:</strong> Multi-particle images introduce instance overlap and ambiguous boundaries, leading to unstable convergence.</li>
+        <li><strong>Approach:</strong> Restrict training data to single-particle images to minimize instance-level ambiguity.</li>
+        <li><strong>Purpose:</strong> Establish a stable reference point for model convergence and segmentation performance.</li>
+        <li><strong>Outcome:</strong> Smooth convergence with low inter-run variance.</li>
+      </ul>
+
+      <p>
+        Under this controlled setting, the U-Net model converged reliably and achieved strong overlap-based performance, reaching an Intersection-over-Union (IoU) of approximately 0.88 and a Dice score of 0.94 at the early-stopping point.
+        <strong> More importantly, the loss curves exhibited smooth convergence with reduced variance across training runs</strong>, indicating that the preprocessing and training pipeline functioned reliably and consistently.
+      </p>
+
+      <!-- Optional figure placeholder -->
+      <figure class="image has-text-centered">
+        <img src="./static/images/1_particle.png"
+             alt="Single-instance results placeholder"
+             class="img-small75"
+             style="display: inline-block; width: 85%; height: auto;">
+        <figcaption class="is-size-6 has-text-grey">
+          Figure 3. Single-instance qualitative results. From left to right: original image / GT / prediction / overlay.
+          (yellow: true positives, red: false positives, green: false negatives).
+        </figcaption>
+      </figure>
+    </div>
+
+    <hr>
+
+    <!-- 4.2 Resolution sensitivity analysis -->
+    <div class="content has-text-justified">
+      <h3 class="title is-4">Resolution sensitivity analysis</h3>
+
+      <p>
+        After establishing a stable single-instance baseline, we examined how much spatial resolution is required to preserve
+        particle morphology without unnecessary computational cost.
+        <strong>
+          Input-size selection was treated as a reproducibility problem rather than a one-off tuning choice.
+        </strong>
+      </p>
+
+      <ul>
+        <li>
+          <strong>Problem:</strong> Input resolution affects boundary detail and training stability, and single-run evaluations can be noisy.
+        </li>
+        <li>
+          <strong>Approach:</strong> Train each resolution five times and compare the best validation IoU per run.
+        </li>
+        <li>
+          <strong>Decision criterion:</strong> Balance accuracy, run-to-run stability, and computational efficiency.
+        </li>
+      </ul>
+
+      <p>
+        Very small resolutions (e.g., 16 and 32 pixels) consistently underperformed, indicating loss of fine particle structure.
+        Performance improved with increasing resolution and plateaued in the mid-range, while resolutions beyond 128 pixels
+        showed no consistent gain and higher variance.
+        <strong>96×96</strong> achieved near-peak IoU with stable performance and was selected for subsequent experiments.
+      </p>
+
+      <figure class="has-text-centered">
+        <img src="./static/images/size.png"
+             alt="Image size vs best validation IoU (5 runs per size)"
+             style="width: 100%; max-width: 720px; height: auto;">
+        <figcaption class="is-size-6 has-text-grey">
+          Figure 4. Resolution sensitivity analysis. Best validation IoU from five independent training runs per input size.
+          Mid-range resolutions reach near-peak performance, while extremely small sizes lose structural detail and very large sizes show diminishing returns.
+        </figcaption>
+      </figure>
+    </div>
+
+    <hr>
+
+    <!-- 4.3 Multi-instance analysis -->
+    <div class="content has-text-justified">
+      <h3 class="title is-4">Multi-particle analysis</h3>
+
+      <p>
+        With the input resolution fixed at 96×96 based on the repeated-training analysis, the same model and training pipeline were applied to images containing multiple particles.
+        This step reintroduces instance overlap, touching boundaries, and higher scene complexity, allowing performance changes to be attributed to data complexity rather than input-size differences.
+      </p>
+
+      <ul>
+        <li><strong>Change in data:</strong> Multiple particles per image with frequent contact and dense regions.</li>
+        <li><strong>Controlled factors:</strong> Same preprocessing (96×96), model (U-Net), and training protocol as the baseline.</li>
+        <li><strong>Goal:</strong> Evaluate robustness and identify failure modes under increased instance-level ambiguity.</li>
+      </ul>
+
+      <p>
+        Compared to the single-instance baseline, segmentation performance became less consistent across samples, and qualitative results indicated degraded boundary separation in dense regions.
+        These observations confirm that the baseline model’s performance deteriorates as instance complexity increases.
+      </p>
+    </div>
+
+    <hr>
+
+    <!-- 4.4 Qualitative & instance-level evaluation -->
+    <div class="content has-text-justified">
+      <h3 class="title is-4">Qualitative &amp; instance-level evaluation</h3>
+
+      <p>
+      While overlap-based metrics such as IoU and Dice summarize pixel-level agreement, they fail to capture instance-level correctness in multi-particle scenarios.
+      In particular, a segmentation can achieve high spatial overlap while incorrectly merging multiple particles, leading to erroneous particle counts.
+      </p>
+
+      <ul>
+        <li><strong>Overlay visualization:</strong> Ground truth and predicted masks combined into a single RGB image.</li>
+        <li><strong>Color coding:</strong> Yellow (true positives), red (false positives), green (false negatives).</li>
+        <li><strong>Objective:</strong> Identify systematic instance-level failure patterns beyond aggregate metrics.</li>
+      </ul>
+
+      <p>
+      Qualitative inspection revealed that the model often localizes foreground regions accurately but fails to separate touching particles, producing merged instances despite reasonable IoU scores.
+      These merge errors dominate in dense regions and directly translate into incorrect particle counts, highlighting a fundamental mismatch between pixel-level performance and instance-level validity.
+      </p>
+
+      <figure class="image has-text-centered">
+        <img src="./static/images/multiple.png"
+             alt="Overlay visualization placeholder"
+             class="img-small75"
+             style="width: 100%; max-width: 720px; height: auto;">
+        <figcaption class="is-size-6 has-text-grey">
+          Figure 5. Example where overlap-based metrics remain high, but instance separation fails.
+          The model correctly localizes foreground regions yet merges multiple particles, leading to incorrect particle counts.
+        </figcaption>
+      </figure>
+    </div>
+
+    <hr>
+
+    <!-- 4.5 Watershed -->
+    <div class="content has-text-justified">
+      <h3 class="title is-4">Watershed</h3>
+
+      <p>
+        In multi-particle images, the dominant failure mode was instance merging: multiple touching particles were often predicted as a single connected region, leading to incorrect particle counts.
+        To address this without retraining the network, watershed-based post-processing was evaluated as a deterministic instance-separation step applied to the model’s predicted masks.
+      </p>
+
+      <ul>
+        <li><strong>Input:</strong> Predicted foreground probability (or binary) mask from the U-Net.</li>
+        <li><strong>Marker extraction:</strong> Distance transform to obtain approximate particle centers.</li>
+        <li><strong>Separation:</strong> Watershed applied to split connected foreground regions.</li>
+        <li><strong>Goal:</strong> Recover instance-level masks and particle counts from pixel-level predictions.</li>
+      </ul>
+
+      <p>
+        The effectiveness of watershed was highly dependent on scene complexity.
+        In single-particle images, a single dominant peak in the distance map led to stable marker placement, and watershed primarily acted as a shape-refinement step with modest improvements.
+        However, in dense multi-particle scenes, reliable geometric separation cues were often absent, resulting in unstable marker initialization and frequent over- or under-segmentation.
+      </p>
+
+      <p>
+        As a consequence, watershed post-processing frequently failed to improve instance-level correctness in the cases where separation was most needed, and in many instances worsened particle count agreement.
+        This highlights a fundamental limitation of heuristic post-processing for resolving instance ambiguity in dense scenes.
+      </p>
+
+      <figure class="has-text-centered">
+        <img src="./static/images/watershed.png"
+             alt="Watershed effect on single-particle images"
+             style="width: 100%; max-width: 720px; height: auto;">
+
+        <figcaption class="is-size-6 has-text-grey">
+          Figure 6. Watershed effect stratified by particle configuration.
+        </figcaption>
+      </figure>
+
+      <p>
+        Based on these observations, watershed was not integrated into the final pipeline.
+        While it can refine isolated structures, its inconsistent behavior in dense multi-particle scenes makes it unreliable for general particle quantification.
+        These results motivate the use of inherently instance-aware approaches, such as boundary-sensitive objectives or instance segmentation methods, rather than relying on heuristic separation after semantic segmentation.
+      </p>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- 5. Discussion & Conclusion -->
 <section class="section">
   <div class="container is-max-desktop">
-<h2 class="title is-3 has-text-centered">A Catchy Title for the First Section</h2>
-      <p>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus tincidunt lectus quis libero interdum, non facilisis sapien aliquet. Sed sit amet ex hendrerit, dignissim purus sit amet, blandit est. Integer nec mauris at dolor egestas volutpat. Quisque efficitur metus vitae dolor fermentum, quis varius neque consectetur.
-      </p>
-    <figure class="image has-text-centered">
-        <img src="./static/images/Template_bar.png"
-       alt="Playfair 1801 chart"
-       class="img-small75"
-       style="display: inline-block; width: 75%; height: auto;">
-      <figcaption class="is-size-6 has-text-grey">
-        Figure 1. Visual representation of the project’s workflow using the template bar.
-      </figcaption>
-    </figure>
     <div class="content has-text-justified">
+      <h2 class="title is-3 has-text-centered">Discussion &amp; Conclusion</h2>
+
       <p>
-        Curabitur suscipit urna ut felis vulputate, nec dictum orci vehicula. Mauris aliquet, nunc et dignissim tincidunt, urna est tempus lacus, ut suscipit ex tellus a ipsum. Donec pretium tempor justo vitae molestie. Fusce ullamcorper leo id purus sodales, at cursus felis lacinia. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
+        This work evaluated semantic segmentation for particle analysis under increasing scene complexity. The results show that while foreground localization remains stable, pixel-level accuracy does not translate to reliable instance-level correctness in dense multi-particle scenarios.
+      </p>
+
+      <p>
+        Single-instance cases are segmented accurately, but increasing particle interactions lead to frequent instance merging, causing incorrect particle counts despite reasonable overlap-based metrics. This confirms that IoU is insufficient for evaluating correctness in dense settings.
+      </p>
+
+      <p>
+        Watershed-based post-processing provides only limited improvement and fails in densely packed scenes, indicating that instance separation cannot be recovered through heuristic methods alone.
+      </p>
+
+      <p>
+        Despite these limitations, the segmentation outputs remain useful when the downstream goal is defined at the level of aggregate foreground properties rather than exact instance delineation. In particular, stable foreground localization can support consistent region-based measurements in applications where precise per-particle separation is not required.
+      </p>
+
+      <p>
+        In conclusion, semantic segmentation is effective for particle analysis within a constrained operating regime but fails to deliver reliable instance-level results in dense scenes. These findings motivate future work on instance-aware segmentation approaches or boundary-sensitive objectives to bridge the gap between pixel-level predictions and instance-level validity.
       </p>
     </div>
   </div>
 </section>
 
-  <section class="section">
-  <div class="container is-max-desktop">
-<h2 class="title is-3 has-text-centered">A Catchy Title for the First Section</h2>
-      <p>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus tincidunt lectus quis libero interdum, non facilisis sapien aliquet. Sed sit amet ex hendrerit, dignissim purus sit amet, blandit est. Integer nec mauris at dolor egestas volutpat. Quisque efficitur metus vitae dolor fermentum, quis varius neque consectetur.
-      </p>
-    <div class="content has-text-justified">
-      <p>
-        Curabitur suscipit urna ut felis vulputate, nec dictum orci vehicula. Mauris aliquet, nunc et dignissim tincidunt, urna est tempus lacus, ut suscipit ex tellus a ipsum. Donec pretium tempor justo vitae molestie. Fusce ullamcorper leo id purus sodales, at cursus felis lacinia. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
-      </p>
-    </div>
-  </div>
-</section>
-  
-
-<section class="section">
-<div class="container is-max-desktop">
-  <div class="columns is-centered">
-
-    <!-- Feature A -->
-    <div class="column">
-      <div class="content">
-        <h2 class="title is-3 has-text-centered">Feature A</h2>
-        <p>
-          In this section, we introduce Feature A, a core component of the project that plays a pivotal role in achieving the overall goals. The importance of this feature stems from its ability to bridge critical gaps in existing workflows, deliver performance enhancements, and unlock new possibilities for visualization, analysis, or interactivity.
-        </p>
-        <!-- Optional media/image/video goes here -->
-        <!-- <img src="./static/images/featureA.png" alt="Feature A illustration"> -->
-      </div>
-    </div>
-    <!-- /Feature A -->
-
-    <!-- Feature B -->
-    <div class="column">
-      <div class="content">
-        <h2 class="title is-3 has-text-centered">Feature B</h2>
-        <p>
-          Feature B is also important. In this section, we introduce Feature B, another core component of the project that plays a pivotal role in achieving the overall goals. The importance of this feature stems from its ability to bridge critical gaps in existing workflows, deliver performance enhancements, and unlock new possibilities for visualization, analysis, or interactivity.
-        </p>
-        <!-- Optional media/image/video goes here -->
-        <!-- <img src="./static/images/featureB.png" alt="Feature B illustration"> -->
-      </div>
-    </div>
-    <!-- /Feature B -->
-
-  </div>
-</div>
-</section>
-
-<section class="section">
-  <div class="container is-max-desktop">
-<h2 class="title is-3 has-text-centered">Another Catchy Title for the Second Section</h2>
-    <figure class="image has-text-centered">
-      <img src="./static/images/waterfall_example.png" alt="Template bar illustration">
-<figcaption class="is-size-6 has-text-grey">
-  Figure 2. Waterfall chart, which shows the cumulative breakdown of changes (positive and negative) across different categories, illustrating how each step contributes to the final total.  
-</figcaption>
-    </figure>
-
-    <div class="content has-text-justified">
-      <p>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus tincidunt lectus quis libero interdum, non facilisis sapien aliquet. Sed sit amet ex hendrerit, dignissim purus sit amet, blandit est. Integer nec mauris at dolor egestas volutpat. Quisque efficitur metus vitae dolor fermentum, quis varius neque consectetur. Curabitur suscipit urna ut felis vulputate, nec dictum orci vehicula. Mauris aliquet, nunc et dignissim tincidunt, urna est tempus lacus, ut suscipit ex tellus a ipsum. Donec pretium tempor justo vitae molestie. Fusce ullamcorper leo id purus sodales, at cursus felis lacinia. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
-      </p>
-    </div>
-  </div>
-</section>
-
-<section class="section">
-  <div class="container is-max-desktop">
-<h2 class="title is-3 has-text-centered">Another Catchy Title for the Third Section</h2>
-    <figure class="image has-text-centered">
-<div style="text-align: center;">
-  <img src="./static/images/P_05-playfair-1801-plate1.png"
-       alt="Playfair 1801 chart"
-       class="img-small75"
-       style="display: inline-block; width: 75%; height: auto;">
-</div>
-<figcaption class="is-size-6 has-text-grey">
-  Figure 3. William Playfair's 1801 'Chart of the Extent, Population and Revenue of the Principal Nations of Europe.' The central pie displays each nation's share of European land area, while red and yellow radial bars show, respectively, population size and annual government revenue. First printed in <em>The Statistical Breviary</em>, it is widely regarded as the earliest known multi-slice pie chart and highlights the contrast between territorial extent, demographic weight, and fiscal power.
-</figcaption>
-
-    </figure>
-
-    <div class="content has-text-justified">
-      <p>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus tincidunt lectus quis libero interdum, non facilisis sapien aliquet. Sed sit amet ex hendrerit, dignissim purus sit amet, blandit est. Integer nec mauris at dolor egestas volutpat. Quisque efficitur metus vitae dolor fermentum, quis varius neque consectetur. Curabitur suscipit urna ut felis vulputate, nec dictum orci vehicula. Mauris aliquet, nunc et dignissim tincidunt, urna est tempus lacus, ut suscipit ex tellus a ipsum. Donec pretium tempor justo vitae molestie. Fusce ullamcorper leo id purus sodales, at cursus felis lacinia. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
-      </p>
-    </div>
-  </div>
-</section>
-
-<section class="section">
-  <div class="container is-max-desktop">
-    <h2 class="title is-3 has-text-centered">Outro</h2>
-    <div class="content">
-      <p>
-        This is the last section. In this part, we bring together all the ideas explored throughout the project, reflecting on what was learned, what worked well, and what challenges emerged. We revisit the core objectives, summarizing how each was addressed, and highlight the most significant insights that have arisen from the work. Moreover, we outline how the outcomes contribute to the broader field, what implications they may have for future research or real-world applications, and why these findings matter. In addition, this section proposes concrete next steps: further experiments, methods refinement, validation on new datasets, collaborative extensions, or deployment scenarios. We also discuss potential limitations, acknowledge open questions, and suggest areas that merit deeper investigation.
-      </p>
-    </div>
-  </div>
-</section>
-
-  <section class="section">
-  <div class="container is-max-desktop">
-    <h2 class="title is-3 has-text-centered">References and Data Sources</h2>
-    <div class="content has-text-justified">
-  <p>  
-    1. Black, Joe; Doe, Jane; and Lee, Maria. “Template Paper Title on Data Analysis.” <em>Journal of Data Analysis & Visualization</em> 30, no. 1 (2023): 100-120.  
-  </p>
-  <p>  
-    2. White, Chris; Green, Anna; and Kim, Sam. “Template Methods for Interactive Dashboards.” <em>International Journal of Interactive Visualization</em> 25, no. 2 (2022): 210-234.  
-  </p>
-  <p>  
-    3. Miller, Pat; Gomez, Sofia; and Zhang, Lin. “Template Techniques for Labels & Annotation in Multidimensional Graphs.” <em>Computational Graphics & Data Systems</em> 12, no. 3 (2024): 45-70.  
-  </p>
-  <p>  
-    4. Wright, Ben; Park, Soo; and O’Neil, Pat. “Template Approaches to Temporal Flow Visualization.” <em>Decision Support & Data Analytics</em> 14, no. 3 (2021): 300-320.  
-  </p>
-    </div>
-  </div>
-</section>
-
-
+<!-- FOOTER (kept same as template style) -->
 <footer class='footer footer-compact'>
   <div class="container">
     <div class="content has-text-centered">
       <p>
-       This website was created as coursework for <strong>CDS 301 / 501: Scientific Information and Data Visualization (Fall 2025) at George Mason Korea</strong>.
+        <!-- Edit this line as needed -->
+        This website was created as a project site.
       </p>
       <p>
         This website is licensed under a <a rel="license"
         href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
       </p>
       <p>
-        Template design is based on the example site available at <a href="https://utkuozbulak.github.io/cds_301_template_website/" target="_blank" rel="noopener">CDS 301 Template Website</a>, which itself uses a layout from the <a href="https://github.com/nerfies/nerfies.github.io" target="_blank" rel="noopener">Nerfies project site</a>.
+        Template design is based on the example site available at
+        <a href="https://utkuozbulak.github.io/cds_301_template_website/" target="_blank" rel="noopener">CDS 301 Template Website</a>,
+        which itself uses a layout from the
+        <a href="https://github.com/nerfies/nerfies.github.io" target="_blank" rel="noopener">Nerfies project site</a>.
       </p>
     </div>
   </div>
 </footer>
 
-
 </body>
 </html>
-

@@ -1,0 +1,72 @@
+    <!-- 2.3 Data diagnostics -->
+    <div class="content has-text-justified">
+      <h3 class="title is-4">Data diagnostics</h3>
+      <p>
+        Before model training, dataset characteristics were quantitatively analyzed to identify potential sources of training instability.
+        Image height-to-width ratios and the number of distinct particles per image were measured from the generated masks and visualized using histograms.
+        These diagnostics reveal variations in input geometry and scene complexity, which can significantly affect optimization behavior and convergence stability.
+        By inspecting these distributions, extreme cases and data imbalance were identified in advance, informing preprocessing decisions and controlled dataset selection for subsequent experiments.
+      </p>
+
+      <!-- Optional figure placeholder -->
+      <figure class="image has-text-centered">
+        <img src="./static/images/h_w_histogram.png"
+             alt="Data diagnostics placeholder"
+             class="img-small75"
+             style="display: inline-block; width: 75%; height: auto;">
+        <figcaption class="is-size-6 has-text-grey">
+          Figure 2. Histograms / plots for aspect ratio and instance count distribution.
+        </figcaption>
+      </figure>
+    </div>
+
+
+
+<!-- 4.6 Inference-based ADB estimation with calibration -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="content has-text-justified">
+      <h3 class="title is-4">Inference-based ADB estimation with calibration</h3>
+
+      <p>
+        Although instance-level segmentation remained challenging in dense multi-particle images,
+        the trained model consistently produced stable foreground localization.
+        Since ADB is an area-derived physical quantity,
+        segmentation outputs were therefore used as a measurement proxy rather than
+        as exact instance delineations.
+        To enable reliable ADB estimation, an inference-time calibration step was introduced.
+      </p>
+
+      <ul>
+        <li><strong>Model:</strong> U-Net trained on the full dataset with fixed preprocessing (96×96).</li>
+        <li><strong>Inference:</strong> 20 repeated runs to assess spatial consistency of predicted masks.</li>
+        <li><strong>Post-processing:</strong> Iterative morphological erosion or dilation.</li>
+        <li><strong>Objective:</strong> Align area-derived measurements with physically meaningful ADB values.</li>
+      </ul>
+
+      <p>
+        Calibration compensates for systematic boundary bias in the predicted masks,
+        which tend to exhibit slight boundary inflation and thus overestimate ADB.
+        Erosion or dilation is applied iteratively, and calibration is stopped at the
+        minimal step that brings the estimate into the target range,
+        relying solely on aggregate foreground area statistics.
+      </p>
+
+      <p>
+        Across repeated inference runs, the total foreground area showed low variance,
+        enabling stable ADB estimation after calibration despite unreliable
+        individual particle boundaries.
+      </p>
+
+      <figure class="has-text-centered">
+        <img src="./static/images/erosion.png"
+             alt="ADB calibration via iterative erosion"
+             style="width: 100%; max-width: 420px; height: auto;">
+        <figcaption class="is-size-6 has-text-grey">
+          Figure 8. Example of erosion-based calibration for ADB estimation.
+        </figcaption>
+      </figure>
+
+    </div>
+  </div>
+</section>
